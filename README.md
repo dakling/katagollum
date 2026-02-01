@@ -80,16 +80,6 @@ Settings are managed via YAML configuration files:
    cp minimal_fast.cfg ~/Go/katago-networks/
    ```
 
-### Using Remote LLMs
-
-To use OpenAI, Anthropic, or other providers:
-
-```yaml
-llm:
-  model: gpt-4
-  base_url: https://api.openai.com/v1
-  # Set OPENAI_API_KEY environment variable
-```
 
 ## Running the Application
 

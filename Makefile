@@ -69,11 +69,15 @@ run-frontend:
 	fi
 
 run-ollama:
-	@if pgrep -f "ollama serve" >/dev/null 2>&1; then echo "Ollama already running"; else \
+	@if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then echo "Ollama already running"; else \
 		echo "Starting Ollama server..."; \
 		ollama serve & \
-		sleep 2; \
-		echo "Ollama server started"; \
+		sleep 3; \
+		if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then \
+			echo "Ollama server started"; \
+		else \
+			echo "ERROR: Failed to start Ollama"; \
+		fi; \
 	fi
 
 up: run-ollama run-mcp run-backend run-frontend
