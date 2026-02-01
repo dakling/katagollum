@@ -1,4 +1,4 @@
-# katagoLLuM (Trash-Talk Go Bot)
+# KataGoLLuM (Trash-Talk Go Bot)
 
 A Go-playing web application featuring an AI opponent with personality. Play Go against KataGo while trading banter with an LLM-powered persona!
 
