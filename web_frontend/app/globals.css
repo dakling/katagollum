@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #1a1a2e;
+  color: #eee;
+}
+
+.go-board {
+  display: grid;
+  background-color: #d4a056;
+  border: 3px solid #5c3d2e;
+}
+
+.go-cell {
+  aspect-ratio: 1;
+  border: 1px solid rgba(92, 61, 46, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.go-cell:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.go-stone {
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.go-stone.black {
+  background: radial-gradient(circle at 30% 30%, #444, #000);
+}
+
+.go-stone.white {
+  background: radial-gradient(circle at 30% 30%, #fff, #ccc);
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.chat-message {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  max-width: 85%;
+}
+
+.chat-message.user {
+  background-color: #3b82f6;
+  margin-left: auto;
+}
+
+.chat-message.assistant {
+  background-color: #374151;
+}
+
+.chat-input {
+  display: flex;
+  padding: 1rem;
+  border-top: 1px solid #374151;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: #1f2937;
+  border: 1px solid #374151;
+  color: #eee;
+  margin-right: 0.5rem;
+}
+
+.chat-input button {
+  padding: 0.75rem 1.5rem;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background-color: #2563eb;
+}

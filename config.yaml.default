@@ -1,0 +1,26 @@
+# Default KataGo LLM Configuration
+# Copy this file to ~/.config/katagollum.yaml and customize as needed
+
+# KataGo Settings
+katago:
+  model: ~/Go/katago-networks/kata1-b28c512nbt-s9584861952-d4960414494.bin.gz
+  config: ~/.config/katago/minimal_fast.cfg
+
+# LLM Settings
+llm:
+  model: llama3.2
+  base_url: http://localhost:11434/v1
+  # Alternative providers:
+  # provider: ollama  # or openai, anthropic
+  # api_key: null  # Set via environment variable for security
+
+# Game Settings
+game:
+  default_board_size: 19
+  default_komi: 6.5
+  default_persona: arrogant
+
+# MCP Server Settings
+mcp:
+  port: 3001
+  transport: sse  # or stdio
