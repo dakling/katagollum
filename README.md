@@ -2,9 +2,7 @@
 
 A Go-playing web application featuring an AI opponent with personality. Play Go against KataGo while trading banter with an LLM-powered persona!
 
-<video src="demo/katagollum-demo.mp4" controls width="100%">
-  Your browser does not support the video tag.
-</video>
+![Demo](demo/katagollum-demo.gif)
 
 ## Features
 
