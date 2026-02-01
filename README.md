@@ -33,7 +33,7 @@ A Go-playing web application featuring an AI opponent with personality. Play Go 
 
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/dakling/katagollum
 cd trash-talk-bot
 
 # Create Python virtual environment
