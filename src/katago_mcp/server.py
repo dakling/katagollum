@@ -303,7 +303,7 @@ def get_tool_definitions() -> list[dict[str, Any]]:
         _func_to_tool(
             _process_user_move,
             "process_user_move",
-            "Process the user's move: commit it to the board, analyze it, and get KataGo's recommended response. Call this once per turn. Arguments: color (user's color, always 'B'), move (user's move coordinate). Returns the user's move analysis and KataGo's recommended move for white.",
+            "Process the user's move: commit it to the board, analyze it, and get KataGo's recommended response. Call this once per turn. Arguments: color (user's color, 'B' for Black or 'W' for White), move (user's move coordinate). Returns the user's move analysis and KataGo's response move.",
         ),
         _func_to_tool(_get_final_score, "get_final_score", "Get the final score of the game."),
     ]

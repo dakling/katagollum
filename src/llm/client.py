@@ -146,8 +146,14 @@ class LLMClient:
     def format_system_prompt(self, base_prompt: str, game_state: dict) -> str:
         board_size = game_state.get("board_size", 19)
         komi = game_state.get("komi", 7.5)
-        player_color = game_state.get("player_color", "black")
-        ai_color = "white" if player_color == "black" else "black"
+        player_color_raw = game_state.get("player_color", "B")
+        # Handle both "B"/"W" and "black"/"white" formats
+        player_is_black = player_color_raw in ("B", "black")
+        player_color = "Black" if player_is_black else "White"
+        ai_color = "White" if player_is_black else "Black"
+
+        # Color code for tool calls
+        player_color_code = "B" if player_is_black else "W"
 
         return f"""{base_prompt}
 
@@ -155,8 +161,9 @@ Current game state:
 - Board size: {board_size}x{board_size}
 - Komi: {komi}
 - You play: {ai_color}
-- User plays: {player_color}
+- User plays: {player_color} (color code: '{player_color_code}')
 
+When calling process_user_move, use color='{player_color_code}' for the user's moves.
 Coordinate format: Use A19 notation (e.g., D4, Q16, T19).
 Respond in an entertaining way - you have personality!
 """.strip()
