@@ -150,8 +150,14 @@ async def process_turn_with_llm(
     komi: float = 6.5,
     user_color: str = "B",
     mcp_url: str = MCP_URL,
-) -> str:
-    """Process a game turn using the same logic as CLI's GoGame._process_turn_via_llm."""
+) -> dict:
+    """Process a game turn using the same logic as CLI's GoGame._process_turn_via_llm.
+
+    Returns:
+        dict with keys:
+            - response: str - The LLM's text response
+            - ai_move: str | None - The AI's move coordinate (e.g., "D4") or None if no move
+    """
     print(
         f"[PROCESS_TURN] Processing turn: user_move={user_move}, persona={persona}, user_color={user_color}"
     )
@@ -160,9 +166,12 @@ async def process_turn_with_llm(
     tools = get_tool_definitions()
     print(f"[PROCESS_TURN] Found {len(tools)} tools from MCP server")
 
+    # Track the AI's move
+    ai_move = None
+
     if not tools:
         print("[PROCESS_TURN] WARNING: No tools found from MCP server!")
-        return "Error: Could not connect to MCP server for tool definitions."
+        return {"response": "Error: Could not connect to MCP server for tool definitions.", "ai_move": None}
 
     messages = chat_history.copy()
     messages.append({"role": "user", "content": f"My move: {user_move}"})
@@ -191,7 +200,7 @@ async def process_turn_with_llm(
     if not tool_calls:
         print(f"[PROCESS_TURN] No tool calls found. Response: {response.content[:200]}...")
         # If no tool calls, just return the conversational response
-        return response.content or "I have nothing to say."
+        return {"response": response.content or "I have nothing to say.", "ai_move": None}
 
     # Process tool calls (should only be process_user_move for actual moves)
     print(f"[PROCESS_TURN] Processing {len(tool_calls)} tool call(s)")
@@ -220,7 +229,7 @@ async def process_turn_with_llm(
                 game_state=game_state,
             )
             print(f"[PROCESS_TURN] Final response after error: {response.content[:100]}...")
-            return response.content or "I have nothing to say."
+            return {"response": response.content or "I have nothing to say.", "ai_move": None}
 
         # Validate tool arguments before executing
         is_valid, error_message = validate_tool_arguments(tool_name, arguments)
@@ -243,7 +252,7 @@ async def process_turn_with_llm(
                 game_state=game_state,
             )
             print(f"[PROCESS_TURN] Final response after error: {response.content[:100]}...")
-            return response.content or "I have nothing to say."
+            return {"response": response.content or "I have nothing to say.", "ai_move": None}
 
         # Normalize arguments before executing
         normalized_arguments = normalize_tool_arguments(arguments)
@@ -254,6 +263,7 @@ async def process_turn_with_llm(
         # Format result for LLM - simple and direct
         if isinstance(result, dict) and result.get("commit_success"):
             katago_move = result.get("katago_move", "PASS")
+            ai_move = katago_move  # Track for return value
             score_delta = result.get("score_delta", 0.0)
 
             # Convert score delta to quality rating (matching prompt definitions)
@@ -291,5 +301,5 @@ async def process_turn_with_llm(
         game_state=game_state,
     )
 
-    print(f"[PROCESS_TURN] Final response: {response.content[:100]}...")
-    return response.content or "I play PASS."
+    print(f"[PROCESS_TURN] Final response: {response.content[:100]}..., ai_move: {ai_move}")
+    return {"response": response.content or "I play PASS.", "ai_move": ai_move}

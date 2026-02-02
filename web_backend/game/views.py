@@ -113,9 +113,10 @@ class GameStateViewSet(viewsets.ModelViewSet):
                 user_color=game.user_color,
             )
         )
-        print(f"[VIEW] Got result: {result[:100]}...")
+        print(f"[VIEW] Got result: {result}")
 
-        bot_response = result
+        bot_response = result.get("response", "")
+        ai_move = result.get("ai_move")
 
         ChatMessage.objects.create(
             game=game,
@@ -128,6 +129,7 @@ class GameStateViewSet(viewsets.ModelViewSet):
             {
                 "game": GameStateSerializer(game).data,
                 "user_move": move_coord,
+                "ai_move": ai_move,
                 "bot_response": bot_response,
             }
         )

@@ -19,6 +19,7 @@ export default function Home() {
     col: number
     color: string
   } | null>(null)
+  const [lastMoveCoord, setLastMoveCoord] = useState<string | null>(null)
 
   // Helper to parse coordinate to row/col
   const parseCoordinate = (coord: string, boardSize: number): { row: number; col: number } => {
@@ -72,18 +73,21 @@ export default function Home() {
           if (firstMoveResult.move) {
             // Update messages with LLM's greeting
             setMessages([
-              { 
-                id: Date.now(), 
-                role: 'assistant', 
-                content: firstMoveResult.message || `I play ${firstMoveResult.move}`, 
-                created_at: new Date().toISOString() 
+              {
+                id: Date.now(),
+                role: 'assistant',
+                content: firstMoveResult.message || `I play ${firstMoveResult.move}`,
+                created_at: new Date().toISOString()
               },
             ])
-            
+
             // Update board with the first move
             if (firstMoveResult.board_state) {
               setBoardState(firstMoveResult.board_state)
             }
+
+            // Track the last move for the marker
+            setLastMoveCoord(firstMoveResult.move)
           } else {
             // No first move needed or error
             setMessages([])
@@ -141,6 +145,15 @@ export default function Home() {
         { id: userMsgId, role: 'user', content: `My move: ${coordinate}`, created_at: new Date().toISOString() },
         { id: Date.now() + 1, role: 'assistant', content: result.bot_response, created_at: new Date().toISOString() },
       ])
+
+      // Track the last move (AI's response move) for the marker
+      console.log('[PAGE] result.ai_move:', result.ai_move, 'type:', typeof result.ai_move)
+      if (result.ai_move) {
+        setLastMoveCoord(result.ai_move)
+      } else {
+        // If no AI move (e.g., pass or game over), show user's last move
+        setLastMoveCoord(coordinate)
+      }
 
       console.log('[PAGE] Fetching board state from KataGo...')
       const kataGoBoard = await getKataGoBoardState()
@@ -298,6 +311,7 @@ export default function Home() {
               userColor={game.user_color}
               onHoverChange={handleHoverChange}
               pendingMove={pendingMove}
+              lastMoveCoord={lastMoveCoord}
             />
           </div>
           <div className="flex-grow max-w-md">

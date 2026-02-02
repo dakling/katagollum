@@ -14,9 +14,10 @@ interface GoBoardProps {
     col: number
     color: string
   } | null
+  lastMoveCoord?: string | null
 }
 
-export default function GoBoard({ boardState, onMoveSubmit, isSubmitting, userColor, onHoverChange, pendingMove }: GoBoardProps) {
+export default function GoBoard({ boardState, onMoveSubmit, isSubmitting, userColor, onHoverChange, pendingMove, lastMoveCoord }: GoBoardProps) {
   const [hoverCoord, setHoverCoord] = useState<string | null>(null)
 
   if (!boardState) {
@@ -39,6 +40,25 @@ export default function GoBoard({ boardState, onMoveSubmit, isSubmitting, userCo
     const number = board_size - row
     return letter + number
   }
+
+  const parseCoordinate = (coord: string): { row: number; col: number } | null => {
+    if (!coord || coord.length < 2) return null
+    const letter = coord[0].toUpperCase()
+    const number = parseInt(coord.slice(1), 10)
+    if (isNaN(number)) return null
+
+    const charCode = letter.charCodeAt(0)
+    // Letters skip 'I', so A-H map to 0-7, J-T map to 8-18
+    const col = charCode > 73 ? charCode - 66 : charCode - 65  // 73 is 'I'
+    const row = board_size - number
+
+    if (row < 0 || row >= board_size || col < 0 || col >= board_size) return null
+    return { row, col }
+  }
+
+  // Parse the last move coordinate for the marker
+  const lastMovePos = lastMoveCoord ? parseCoordinate(lastMoveCoord) : null
+  console.log('[GOBOARD] lastMoveCoord:', lastMoveCoord, '-> lastMovePos:', lastMovePos)
 
   const handleCellClick = async (row: number, col: number) => {
     if (isSubmitting) return
@@ -231,13 +251,28 @@ export default function GoBoard({ boardState, onMoveSubmit, isSubmitting, userCo
               >
                 {cell !== '.' && (
                   <div
-                    className="w-8 h-8 rounded-full shadow-lg"
+                    className="w-8 h-8 rounded-full shadow-lg relative"
                     style={{
                       background: cell === 'B'
                         ? 'radial-gradient(circle at 30% 30%, #444, #000)'
                         : 'radial-gradient(circle at 30% 30%, #fff, #ccc)',
                     }}
-                  />
+                  >
+                    {/* Last move marker - contrasting circle */}
+                    {lastMovePos && lastMovePos.row === rowIndex && lastMovePos.col === colIndex && (
+                      <div
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <div
+                          className="w-4 h-4 rounded-full border-2"
+                          style={{
+                            borderColor: cell === 'B' ? '#fff' : '#000',
+                            backgroundColor: 'transparent',
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 )}
                 {isHovered && cell === '.' && (
                   <div
