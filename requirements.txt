@@ -8,3 +8,4 @@ pyyaml>=6.0
 starlette>=0.40
 structlog>=24.0
 uvicorn>=0.30
+django-cors-headers

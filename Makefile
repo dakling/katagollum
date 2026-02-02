@@ -61,11 +61,11 @@ run-backend:
 	fi
 
 run-frontend:
-	@if lsof -ti:3000 >/dev/null 2>&1; then echo "Next.js frontend already running on port 3000"; else \
-		echo "Starting Next.js frontend on port 3000..."; \
+	@if lsof -ti:3002 >/dev/null 2>&1; then echo "Next.js frontend already running on port 3000"; else \
+		echo "Starting Next.js frontend on port 3002..."; \
 		cd $(FRONTEND_DIR) && npm run dev & \
 		sleep 5; \
-		echo "Next.js frontend started on http://localhost:3000"; \
+		echo "Next.js frontend started on http://localhost:3002"; \
 	fi
 
 run-ollama:
@@ -87,7 +87,7 @@ up: run-ollama run-mcp run-backend run-frontend
 	@echo "=========================================="
 	@echo "MCP Server:   http://localhost:3001"
 	@echo "Django API:   http://localhost:8000"
-	@echo "Frontend:     http://localhost:3000"
+	@echo "Frontend:     http://localhost:3002"
 	@echo ""
 	@echo "Press Ctrl+C to stop all servers"
 	@echo "=========================================="

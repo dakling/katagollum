@@ -36,7 +36,7 @@ A Go-playing web application featuring an AI opponent with personality. Play Go 
 ```bash
 # Clone repository
 git clone https://github.com/dakling/katagollum
-cd trash-talk-bot
+cd katagollum
 
 # Create Python virtual environment
 python -m venv .venv
