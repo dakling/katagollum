@@ -93,9 +93,9 @@ This starts:
 - **Ollama** (if not running)
 - **KataGo MCP Server** (port 3001)
 - **Django Backend** (port 8000)
-- **Next.js Frontend** (port 3000)
+- **Next.js Frontend** (port 3002)
 
-Then open http://localhost:3000 in your browser.
+Then open http://localhost:3002 in your browser.
 
 ### Individual Services
 
@@ -114,7 +114,7 @@ make down          # Stop all servers and clear cache
 
 ## Usage
 
-1. Open http://localhost:3000
+1. Open http://localhost:3002
 2. Configure game settings:
    - Board size (9x9, 13x13, 19x19)
    - Game type (Default, No Komi, or Handicap 2-9 stones)
@@ -127,7 +127,7 @@ make down          # Stop all servers and clear cache
 ## Project Structure
 
 ```
-trash-talk-bot/
+katagollum/
 ├── config.yaml.default          # Default configuration template
 ├── minimal_fast.cfg             # Fast KataGo settings
 ├── Makefile                     # Build and run commands
@@ -209,7 +209,7 @@ make clear-cache
 
 Check if ports 3000, 3001, or 8000 are in use:
 ```bash
-lsof -ti:3000  # Frontend
+lsof -ti:3002  # Frontend
 lsof -ti:3001  # MCP Server
 lsof -ti:8000  # Backend
 ```

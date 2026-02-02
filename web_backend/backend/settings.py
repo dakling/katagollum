@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-s1$ffxj%bc*ai%4#!!8dma7-$v@s%93d*2hwyk%l46yt^xpetk"
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-only-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'  # TODO: Change back to 'False' for production
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
@@ -55,10 +56,10 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://localhost:3002",
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:3002",
 ]
-
-CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "backend.urls"
 

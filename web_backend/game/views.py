@@ -1,12 +1,16 @@
-import asyncio
 import httpx
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from asgiref.sync import async_to_sync
 import sys
 from pathlib import Path
 
+# TODO: Issue #9 - sys.path manipulation is fragile. Consider:
+# 1. Installing the src package properly (pip install -e . from project root)
+# 2. Setting PYTHONPATH environment variable in deployment config
+# 3. Using Django's INSTALLED_APPS with proper package structure
 backend_dir = Path(__file__).resolve().parent.parent
 project_root = backend_dir.parent
 sys.path.insert(0, str(project_root))
@@ -77,6 +81,9 @@ class GameStateViewSet(viewsets.ModelViewSet):
         if col >= 8:
             col -= 1
         row = size - int(gtp_coord[1:])
+        # Bounds validation
+        if not (0 <= row < size and 0 <= col < size):
+            raise ValueError(f"Coordinate {gtp_coord} out of bounds for board size {size}")
         return row, col
 
     @action(detail=True, methods=["post"])
@@ -97,21 +104,22 @@ class GameStateViewSet(viewsets.ModelViewSet):
             move_number=move_number,
         )
 
+        # Get last 10 messages (Django querysets don't support negative indexing)
+        recent_messages = list(game.chat_messages.all().order_by("-created_at")[:10])
+        recent_messages.reverse()  # Put back in chronological order
         chat_history = [
             {"role": m.role, "content": m.content}
-            for m in game.chat_messages.all().order_by("created_at")[10:]
+            for m in recent_messages
         ]
 
         print(f"[VIEW] Calling process_turn_with_llm for move: {move_coord}")
-        result = asyncio.run(
-            process_turn_with_llm(
-                user_move=move_coord,
-                chat_history=chat_history,
-                persona=game.persona,
-                board_size=game.board_size,
-                komi=game.komi,
-                user_color=game.user_color,
-            )
+        result = async_to_sync(process_turn_with_llm)(
+            user_move=move_coord,
+            chat_history=chat_history,
+            persona=game.persona,
+            board_size=game.board_size,
+            komi=game.komi,
+            user_color=game.user_color,
         )
         print(f"[VIEW] Got result: {result}")
 
@@ -162,24 +170,25 @@ class ChatViewSet(viewsets.ModelViewSet):
             return Response({"error": "Game not found"}, status=status.HTTP_404_NOT_FOUND)
 
         if role == "user":
+            # Get last 10 messages (Django querysets don't support negative indexing)
+            recent_messages = list(game.chat_messages.all().order_by("-created_at")[:10])
+            recent_messages.reverse()  # Put back in chronological order
             chat_history = [
                 {"role": m.role, "content": m.content}
-                for m in game.chat_messages.all().order_by("created_at")[10:]
+                for m in recent_messages
             ]
 
             print(f"[VIEW] Calling process_turn_with_llm for chat: {content[:50]}...")
-            result = asyncio.run(
-                process_turn_with_llm(
-                    user_move=content,
-                    chat_history=chat_history,
-                    persona=game.persona,
-                    board_size=game.board_size,
-                    komi=game.komi,
-                    user_color=game.user_color,
-                )
+            result = async_to_sync(process_turn_with_llm)(
+                user_move=content,
+                chat_history=chat_history,
+                persona=game.persona,
+                board_size=game.board_size,
+                komi=game.komi,
+                user_color=game.user_color,
             )
 
-            bot_content = result if result else "..."
+            bot_content = result.get("response", "...") if result else "..."
 
             user_msg = ChatMessage.objects.create(game=game, role="user", content=content)
             bot_msg = ChatMessage.objects.create(game=game, role="assistant", content=bot_content)

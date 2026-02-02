@@ -19,6 +19,10 @@ logger = structlog.get_logger(__name__)
 
 mcp = FastMCP("KataGo")
 
+# Global mutable state for the current game session.
+# LIMITATION: This design only supports a single game at a time per server instance.
+# TODO: Refactor to a GameSession class with session IDs to support multiple concurrent games.
+#       This would allow each client to have their own isolated game state.
 gtp_client: GTPClient | None = None
 exit_stack = AsyncExitStack()
 
@@ -436,7 +440,7 @@ def main():
         )
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=["*"],
+            allow_origins=["http://localhost:3000", "http://localhost:3002", "http://127.0.0.1:3000", "http://127.0.0.1:3002"],
             allow_methods=["GET", "POST"],
             allow_headers=["*"],
         )

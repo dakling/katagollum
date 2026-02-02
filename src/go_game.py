@@ -15,7 +15,7 @@ LLM_MODEL = get_llm_model()
 MCP_URL = os.getenv("MCP_URL", "http://localhost:3001")
 
 
-def normalize_tool_arguments(arguments: dict) -> dict:
+def normalize_tool_arguments(arguments: dict[str, Any]) -> dict[str, Any]:
     """Normalize tool call arguments for validation."""
     normalized = arguments.copy()
 
@@ -59,7 +59,7 @@ def validate_move_format(move: str) -> bool:
     return True
 
 
-def validate_tool_arguments(tool_name: str, arguments: dict) -> tuple[bool, str]:
+def validate_tool_arguments(tool_name: str, arguments: dict[str, Any]) -> tuple[bool, str]:
     """Validate tool call arguments."""
     if tool_name != "process_user_move":
         return True, ""
@@ -119,7 +119,7 @@ def get_tool_definitions() -> list[dict[str, Any]]:
     return []
 
 
-def call_mcp_tool(tool_name: str, arguments: dict) -> dict:
+def call_mcp_tool(tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
     """Call an MCP tool synchronously."""
     try:
         with httpx.Client(timeout=600.0) as client:
@@ -132,7 +132,7 @@ def call_mcp_tool(tool_name: str, arguments: dict) -> dict:
         return {"error": str(e)}
 
 
-async def call_mcp_tool_async(tool_name: str, arguments: dict) -> dict:
+async def call_mcp_tool_async(tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
     """Call an MCP tool asynchronously."""
     async with httpx.AsyncClient(timeout=600.0) as client:
         response = await client.post(
@@ -144,13 +144,13 @@ async def call_mcp_tool_async(tool_name: str, arguments: dict) -> dict:
 
 async def process_turn_with_llm(
     user_move: str,
-    chat_history: list[dict],
+    chat_history: list[dict[str, str]],
     persona: str,
     board_size: int = 19,
     komi: float = 6.5,
     user_color: str = "B",
     mcp_url: str = MCP_URL,
-) -> dict:
+) -> dict[str, str | None]:
     """Process a game turn using the same logic as CLI's GoGame._process_turn_via_llm.
 
     Returns:

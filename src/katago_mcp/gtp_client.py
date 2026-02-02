@@ -51,6 +51,7 @@ class GTPClient:
         self.process: asyncio.subprocess.Process | None = None
         self.command_id = 0
         self._initialized = False
+        self.board_size: int = 19  # Default board size, updated by set_board_size
         self.previous_score: float = (
             0.0  # Normalized score: positive = Black lead, negative = White lead
         )
@@ -346,7 +347,8 @@ class GTPClient:
                 message=result.message,
             )
         else:
-            # Reset score tracking since board size changed (implies new game)
+            # Store the board size and reset score tracking since board size changed (implies new game)
+            self.board_size = size
             self.previous_score = 0.0
             logger.debug(f"Reset previous_score to 0.0 (board size set to {size})")
         return result.success
@@ -566,8 +568,8 @@ class GTPClient:
         """Get the current board state from KataGo using showboard command."""
         result = await self.send_command("showboard")
         if result.success and result.message:
-            board = self._parse_showboard_output(result.message, 19)
-            return {"board": board, "board_size": 19}
+            board = self._parse_showboard_output(result.message, self.board_size)
+            return {"board": board, "board_size": self.board_size}
         return {"board": [], "board_size": 0}
 
 

@@ -92,11 +92,14 @@ export default function GoBoard({ boardState, onMoveSubmit, isSubmitting, userCo
         })
       })
     } else if (size === 9) {
-      ;[4, 4].forEach(r => {
-        ;[4, 4].forEach(c => {
+      // 9x9 has 5 star points: 4 corners and center
+      const positions = [2, 6]
+      positions.forEach(r => {
+        positions.forEach(c => {
           stars[r][c] = true
         })
       })
+      stars[4][4] = true // center
     }
     return stars
   }

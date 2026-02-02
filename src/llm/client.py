@@ -189,10 +189,20 @@ Respond in an entertaining way - you have personality!
 
             if "tool_calls" in message:
                 for tc in message["tool_calls"]:
+                    try:
+                        arguments = json.loads(tc["function"]["arguments"])
+                    except json.JSONDecodeError as e:
+                        logger.error(
+                            "Failed to parse tool call arguments",
+                            error=str(e),
+                            tool_name=tc["function"]["name"],
+                            raw_arguments=tc["function"]["arguments"][:200] if tc["function"]["arguments"] else "",
+                        )
+                        arguments = {}
                     tool_calls.append(
                         ToolCall(
                             name=tc["function"]["name"],
-                            arguments=json.loads(tc["function"]["arguments"]),
+                            arguments=arguments,
                         )
                     )
 

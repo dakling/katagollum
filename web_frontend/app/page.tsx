@@ -155,34 +155,7 @@ export default function Home() {
         setLastMoveCoord(coordinate)
       }
 
-      console.log('[PAGE] Fetching board state from KataGo...')
-      const kataGoBoard = await getKataGoBoardState()
-      console.log('[PAGE] Got KataGo board:', JSON.stringify(kataGoBoard))
-      console.log('[PAGE] KataGo board valid?', !!kataGoBoard && kataGoBoard.board.length > 0)
-
-      if (kataGoBoard && kataGoBoard.board.length > 0) {
-        console.log('[PAGE] Updating board with KataGo state, board rows:', kataGoBoard.board.length)
-        console.log('[PAGE] First row sample:', kataGoBoard.board[0].join(''))
-        console.log('[PAGE] Board contains stones:', kataGoBoard.board.some(row => row.some(cell => cell !== '.')))
-        setBoardState(prev => {
-          const newState = {
-            board_size: kataGoBoard.board_size,
-            komi: prev?.komi || game.komi,
-            user_color: prev?.user_color || game.user_color,
-            ai_color: prev?.ai_color || game.ai_color,
-            game_over: prev?.game_over || game.game_over,
-            board: kataGoBoard.board,
-            moves: prev?.moves || [],
-          }
-          console.log('[PAGE] Set board state to:', newState)
-          return newState
-        })
-      } else {
-        console.log('[PAGE] KataGo board not available, falling back to database')
-        const board = await getGameBoard(game.id)
-        console.log('[PAGE] Got DB board, board rows:', board.board.length)
-        setBoardState(board)
-      }
+      await syncBoardWithKataGo()
     } catch (err) {
       setError('Failed to submit move')
       console.error(err)
@@ -196,6 +169,39 @@ export default function Home() {
 
   const handleHoverChange = (coord: string | null) => {
     setPreviewCoord(coord)
+  }
+
+  const syncBoardWithKataGo = async () => {
+    if (!game) return
+
+    console.log('[PAGE] Fetching board state from KataGo...')
+    const kataGoBoard = await getKataGoBoardState()
+    console.log('[PAGE] Got KataGo board:', JSON.stringify(kataGoBoard))
+    console.log('[PAGE] KataGo board valid?', !!kataGoBoard && kataGoBoard.board.length > 0)
+
+    if (kataGoBoard && kataGoBoard.board.length > 0) {
+      console.log('[PAGE] Updating board with KataGo state, board rows:', kataGoBoard.board.length)
+      console.log('[PAGE] First row sample:', kataGoBoard.board[0].join(''))
+      console.log('[PAGE] Board contains stones:', kataGoBoard.board.some(row => row.some(cell => cell !== '.')))
+      setBoardState(prev => {
+        const newState = {
+          board_size: kataGoBoard.board_size,
+          komi: prev?.komi || game.komi,
+          user_color: prev?.user_color || game.user_color,
+          ai_color: prev?.ai_color || game.ai_color,
+          game_over: prev?.game_over || game.game_over,
+          board: kataGoBoard.board,
+          moves: prev?.moves || [],
+        }
+        console.log('[PAGE] Set board state to:', newState)
+        return newState
+      })
+    } else {
+      console.log('[PAGE] KataGo board not available, falling back to database')
+      const board = await getGameBoard(game.id)
+      console.log('[PAGE] Got DB board, board rows:', board.board.length)
+      setBoardState(board)
+    }
   }
 
   const handleChatMessage = async (content: string) => {
@@ -236,34 +242,7 @@ export default function Home() {
         },
       ])
 
-      console.log('[PAGE] Fetching board state from KataGo after chat...')
-      const kataGoBoard = await getKataGoBoardState()
-      console.log('[PAGE] Got KataGo board:', JSON.stringify(kataGoBoard))
-      console.log('[PAGE] KataGo board valid?', !!kataGoBoard && kataGoBoard.board.length > 0)
-
-      if (kataGoBoard && kataGoBoard.board.length > 0) {
-        console.log('[PAGE] Updating board with KataGo state, board rows:', kataGoBoard.board.length)
-        console.log('[PAGE] First row sample:', kataGoBoard.board[0].join(''))
-        console.log('[PAGE] Board contains stones:', kataGoBoard.board.some(row => row.some(cell => cell !== '.')))
-        setBoardState(prev => {
-          const newState = {
-            board_size: kataGoBoard.board_size,
-            komi: prev?.komi || game.komi,
-            user_color: prev?.user_color || game.user_color,
-            ai_color: prev?.ai_color || game.ai_color,
-            game_over: prev?.game_over || game.game_over,
-            board: kataGoBoard.board,
-            moves: prev?.moves || [],
-          }
-          console.log('[PAGE] Set board state to:', newState)
-          return newState
-        })
-      } else {
-        console.log('[PAGE] KataGo board not available, falling back to database')
-        const board = await getGameBoard(game.id)
-        console.log('[PAGE] Got DB board, board rows:', board.board.length)
-        setBoardState(board)
-      }
+      await syncBoardWithKataGo()
     } catch (err) {
       console.error('Chat error:', err)
       setError('Failed to send message')
