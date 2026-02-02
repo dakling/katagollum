@@ -1,11 +1,12 @@
 import asyncio
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict
 
 import structlog
 
-from ..config_loader import get_katago_model, get_katago_config
+from ..config_loader import get_katago_binary, get_katago_model, get_katago_config
 
 logger = structlog.get_logger(__name__)
 
@@ -34,10 +35,11 @@ class GTPClient:
     def __init__(self, katago_command: list[str] | None = None, config: dict | None = None):
         if katago_command is None:
             # Get paths from config file
+            binary_path = get_katago_binary()
             model_path = get_katago_model()
             config_path = get_katago_config()
             katago_command = [
-                "katago",
+                binary_path,
                 "gtp",
                 "-model",
                 model_path,
@@ -77,7 +79,7 @@ class GTPClient:
                 break
 
     async def start(self) -> None:
-        env = {}
+        env = os.environ.copy()
         for key, value in self.config.items():
             env[f"KATAGO_{key.upper()}"] = str(value)
 

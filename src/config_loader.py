@@ -39,6 +39,17 @@ def get_config() -> dict[str, Any]:
         return {}
 
 
+def get_katago_binary() -> str:
+    """Get KataGo binary path from config.
+
+    If not specified, defaults to 'katago' (uses PATH lookup).
+    Useful when katago is installed in a non-standard location.
+    """
+    config = get_config()
+    binary_path = config.get("katago", {}).get("binary", "katago")
+    return os.path.expanduser(binary_path)
+
+
 def get_katago_model() -> str:
     """Get KataGo model path from config."""
     config = get_config()

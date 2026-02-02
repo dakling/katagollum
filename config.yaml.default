@@ -3,6 +3,9 @@
 
 # KataGo Settings
 katago:
+  # Path to katago binary (optional - defaults to 'katago' which uses PATH)
+  # Useful if katago is installed in a non-standard location
+  binary: katago
   model: ~/Go/katago-networks/kata1-b28c512nbt-s9584861952-d4960414494.bin.gz
   config: ~/.config/katago/minimal_fast.cfg
 
